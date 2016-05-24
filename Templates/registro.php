@@ -3,14 +3,39 @@
 	{
 		for($i=0;$i<5;$i++)
 		{
-			$x = rand(32,63);
-			$c = chr($x);
-			if(!isset($ascii))
-				$ascii = $c;
+			$x1 = rand(36,62);
+			$c1 = chr($x1+$x1);
+			$x2 = rand(16,62);
+			$c2 = chr($x2+$x2);
+			if(!isset($ascii1))
+				$ascii1 = $c1;
 			else
-				$ascii = $ascii . $c;
+				$ascii1 = $ascii1 . $c1;
+			
+			if(!isset($ascii2))
+				$ascii2 = $c2;
+			else
+				$ascii2 = $ascii2 . $c2;
 		}
-		echo "<br/>".$ascii."<br/>";
+		echo "<br/>".$ascii1."<br/>";
+		echo $ascii2."<br/>";
+		
+		$c = strlen($p);
+		for($i=0;$i<$c;$i++)
+		{
+			$concat = substr($p, $i, 1);
+			$ascii = ord($concat);
+			$ascii = $ascii+10;
+			$resul = chr($ascii);
+			if(!isset($r))
+				$r = $resul;
+			else
+				$r = $r . $resul;
+		}
+		echo '<br/>'.$r.'<br/>';
+		$r = $ascii1 . $r;
+		$r = $r . $ascii2;
+		echo $r.'<br/>';
 		return;
 	}
 	if(!isset($_POST['nombre']))
@@ -67,7 +92,7 @@ echo	'<title> Seguridad </title>
 						//echo 'Bienvenid@: '.$nombre.
 						//'<a href="proyecto_seg.html"> Continuar </a>';
 						cifrar($pass);
-						echo "contra";
+						//echo "contra";
 						//mysqli_query($conect, "INSERT INTO user VALUES ('$nombre','$contra')");
 					}
 				else
