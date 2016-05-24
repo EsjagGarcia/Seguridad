@@ -33,15 +33,57 @@
 				$r = $r . $resul;
 		}
 		echo '<br/>'.$r.'<br/>';
+		$r = t2($r);
 		$r = $ascii1 . $r;
 		$r = $r . $ascii2;
 		echo $r.'<br/>';
 		return;
 	}
+	
+	function t2($res)
+	{
+		$a = strlen($res);
+		echo '<br/>'.$a.'<br/>';
+		if($a%2 == 0)
+		{
+			for($i=0;$i<$a;$i+=2)
+			{
+				$r = substr($res,$i,2);
+				//echo $r.'<br/>';
+				for($j=0;$j<=1;$j++)
+				{
+					$s = substr($r,$j,1);
+					echo "<br/>".$s;
+					if(!isset($t1))
+						$t1 = $s;
+					else
+						$t2 = $s;
+				}
+				$d1 = ord($t1);
+				$d2 = ord($t2);
+				$d = $d1 + $d2;
+				if($d > 126)
+					$d = $d - 130;
+				elseif($d < 32)
+					$d = $d - 32;
+				echo "<br/>".$d;
+				$e = chr($d);
+				echo "<br>".$e;
+				if(!isset($rn))
+					$rn = $e;
+				else
+					$rn = $rn . $e;
+				echo "<br/>".$rn."<br/>";
+			}
+			echo "<br/>".$rn."<br/>";
+		}
+	}
+	
+echo '<title> Seguridad </title>';
+		
 	if(!isset($_POST['nombre']))
 	{
-echo	'<title> Seguridad </title>
-		<form action="registro.php" method="POST">
+echo	'<form action="registro.php" method="POST">
 			Nombre de usuario: <input type="text" maxleght="15" name="nombre" required/><small> Tu nombre puede tener números y letras, pero no caracteres especiales, y puede ser de 5 a 15 caracteres </small><br/>
 			Contraseña: <input type="password" name="password" maxleght="15" required/>
 			<small> Puede contener letras, números, y algunos carácteres especiales como: ( _ / . / - / @ ). Debe de tener una longitud mínima de 8 caracters y puede llegar hasta 15 </small><br/>
