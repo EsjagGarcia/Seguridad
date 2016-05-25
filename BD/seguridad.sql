@@ -1,0 +1,1 @@
+CREATE TABLE prueba(nombre varchar(15), cont varchar(30), sexo char(1));

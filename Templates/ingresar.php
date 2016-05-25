@@ -58,10 +58,6 @@
 		
 		//....
 		
-		$rn = $ascii1 . $rn;
-		$rn = $rn . $n;
-		$rn = $rn . $ascii2;
-		
 		//....
 		
 		return $rn;
@@ -131,6 +127,22 @@
 		
 	}
 	
+	function comparar($pass, $conect, $nombre)
+	{
+		$n = mysqli_fetch_array(mysqli_query($conect,"SELECT * FROM user WHERE nombre LIKE '%$nombre%';"));
+		$n1 = $n['1'];
+		$count = strlen($n1);
+		for($i=5;$i<$count-8;$i++)
+		{
+			$newp = substr($n1,$i,1);
+			if(!isset($c))
+				$c = $newp;
+			else
+				$c = $c . $newp;
+		}
+		return $c;
+	}
+	
 	// termina el hash.
 	
 echo '<!DOCTYPE html>
@@ -139,31 +151,27 @@ echo '<!DOCTYPE html>
 			<title> Seguridad </title>
 		</head>
 		<body>';
-	if(isset($_COOKIE['nombre']))
+		
+	if(isset($_COOKIE['go']))
 	{
 		if(!isset($_POST['nombre']))
 		{
 		
-echo		'<form action="registro.php" method="POST">
-			
-				Nombre de usuario: <input type="text" maxleght="15" name="nombre" required autofocus/> <small> Tu nombre puede tener números, letras, y algunos caracters especiales(@, . , _ , -), y debe tener de 5 a 15 caracteres </small><br/>
-			
-				Contraseña: <input type="password" name="password" maxleght="15" required/> 			<small> Puede contener letras o números, asi como algunos caracteres especiales(@, _ , -). Debe de tener una longitud mínima de 8 caracteres y puede llegar hasta 15 </small><br/>
-			
-				Sexo:<br/>
-					Masculino: <input type="radio" name="sexo" value="m"/><br/>
-					Femenino: <input type="radio" name="sexo" value="f"/><br/>
-				
-				<input type="submit" value="Registrarse">
+echo		'<form action="ingresar.php" method="POST">
+				Nombre de usuario: <input type="text" maxleght="15" name="nombre" required autofocus /><br/>
+				Contraseña: <input type="password" name="password" maxleght="15" required/><br/>
+				<input type="submit" value="Entrar"/>
 				<br/><a href="proyecto_seg.php"> Volver al menú </a>
-			</form>';
-		
-			$value = rand(1,10);
-			if(!isset($_COOKIE['inicio']))
-				setcookie("Inicio", $value, time() + 10);
+			</form>';			
 		}
-		else//if(isset($_COOKIE['Inicio'])) Intente evitar el Cross site request
+		else//if(isset($_COOKIE['Inicio']))
 		{
+		
+			//Borra la cookie para la siguiente visita.
+		
+			setcookie("go", "0", time() - 1);
+		
+			//.
 		
 			//Escapar caracteres especiales.
 		
@@ -172,96 +180,61 @@ echo		'<form action="registro.php" method="POST">
 			$pass = htmlspecialchars($_POST['password']);
 			$pass = addslashes($pass);
 			$conect = mysqli_connect("localhost","root");
-		
-			if(!isset($_POST['sexo']))
-				$sexo = 's';
-			else
-				$sexo = $_POST['sexo'];
-		
+			
 			//.
-		
+			
 			// Busquedas y validacones a la base de datos
 		
 			if(mysqli_select_db($conect,"seg"))
 			{
 				$search = mysqli_query($conect,"SELECT nombre FROM user WHERE nombre LIKE '%$nombre%';");
-				$nombre = mysqli_real_escape_string($conect, $nombre);
-				$pass = mysqli_real_escape_string($conect, $pass);
 				$na = mysqli_fetch_array(mysqli_query($conect,"SELECT nombre FROM user WHERE nombre LIKE '%$nombre%';"));
 				$name = $na['nombre'];
+								
+				// Validación para pasar a bd
 			
-				// Expresiones regulares
-			
-				$nc = "/[a-zA-Z0-9\@\.\_\-]{5,15}/";
-				$pc = "/[a-z0-9\@\_\-]{8,15}/";
-				$compn = preg_match($nc, $nombre);
-				$compp = preg_match($pc, $pass);
-				
-				//.....
-			
-				// Comprobación del nombre
-			
-				if($compn != 0)
+				if($nombre == $name)
 				{
-				
-					// Comprobación de la contraseña
-				
-					if($compp == 0)
+					// Introduce en la base de datos
+						
+					$contra = cifrar($pass);
+					$dev = comparar($contra, $conect, $name);
+					if($dev == $contra)
 					{
-						echo 'Tu cadena no es válida
-						<a href="registro.php"> Volver a intentar </a>';
-					}	//(Contraseña)
-					else	// Cuando no se cumpla
+echo					"<br/>Todo en orden
+						<br/><a href='menu.php'> Entrar </a>";
+					}
+					else
 					{
-						// Validación para pasar a bd
+echo					"<br/> Tu contraseña es incorrecta
+						<br/><a href='ingresar.php'> Reintentar </a><br/>";
+					}
 					
-						if($nombre != $name)
-						{
-							// Estable un salud según el sexo
-						
-							if($sexo == 'f')
-								echo 'Bienvenida: '.$nombre;
-							elseif($sexo == 'm')
-									echo 'Bienvenido: '.$nombre;
-								else
-									echo 'Bienvenid@ abordo: '.$nombre;
-						
-							//....(saludo)
-							// Introduce en la base de datos
-						
-echo						'<br/><a href="ingresar.php"> Continuar </a>';
-							$contra = cifrar($pass);
-							mysqli_query($conect, "INSERT INTO user VALUES ('$nombre','$contra','$sexo')");
-						
-							//....(introduce)
-						
-						}	//(bd)
-						else	// Cuando no se cumpla
-						{
-						
-							echo "Nombre ya existente
-							<br/><a href='registro.php'> Volver a intentar </a>";
-						
-						}	//....(bd/si no)
-					
-					}	//....(Contraseña/si no)
-				
-				} 	//....(Nombre)			
-				else	// Si no se cumple
+					//....(introduce)
+							
+				}	//(bd)
+				else	// Cuando no se cumpla
 				{
-					echo 'Tu cadena no es válida
-					<a href="registro.php"> Volver a intentar </a>';
-				}	//....(Nombre/si no)
-			}
+						
+					echo "El usuario no existe.
+					<br/><a href='ingresar.php'> Volver a intentar </a>
+					<a href='registro.php'> Registrarse </a>";
+						
+				}	//....(bd/si no)
+			}		
 			else
-				echo "No esta bien";
+			{
+echo			 "Algo no va bien;
+				<br/><a href='proyecto_seg.php'> Volver a intentar </a>";
+			}
 		
 			mysqli_close($conect);
-		
+			
 			//.
+			
+			setcookie("go", 0, time() - 1);
 			$value = rand(1,100);
-			setcookie("Inicio", "0", time() - 1);
-			setcookie("go", $value, time() + 10);
+				setcookie("vamos", $value, time() + 10);
 		}
 	}
 	else
@@ -273,5 +246,6 @@ echo	'Hubo un error en nuestra página, es posible que estes ingresando de una p
 	}
 		
 echo 	'</body>
-	</html>';
+	</html>'
+
 ?>

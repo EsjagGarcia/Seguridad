@@ -3,9 +3,14 @@
 		<title> Seguridad </title>
 	</head>
 	<body>
-		<form method="POST" action="proyecto_seg.php">
+	<?php
+	
+echo	'<form method="POST" action="proyecto_seg.php">
 			<button name="entrar" type="button"><a href="ingresar.php"> INGRESAR </a></button>
 			<button name="registro" type="button"><a href="registro.php"> REGISTRARSE </a></button>
-		</form>
+		</form>';
+		setcookie("Inicio", "0", time() + 10);
+		
+	?>
 	</body>
 </html>
